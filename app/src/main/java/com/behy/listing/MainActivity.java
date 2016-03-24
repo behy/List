@@ -84,7 +84,9 @@ public class MainActivity extends AppCompatActivity
             String spName="CAT_" + Integer.toString(j,3);
             SharedPreferences.Editor editor = getSharedPreferences(spName, MODE_PRIVATE).edit();
             editor.putString("NAME","cat_xx");
-            editor.putStringSet("ITEM_TITLE",title_set);
+            editor.putStringSet("ITEM_TITLE", title_set);
+            editor.putStringSet("ITEM_SUBTITLE", subtitle_set);
+            editor.commit();
         }
 
         // _____________________ save init data in SharedPreferences
@@ -121,13 +123,34 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         context = this;
-
+//        inizializeCats();
         SharedPreferences setting = getSharedPreferences(_settingFile, MODE_PRIVATE);
         if (setting.contains(_initFlag) && setting.getBoolean(_initFlag, false)) {        // is initialized
+            int catCount=setting.getInt(_cat_no,0);
+            if(catCount>0){
+                for(int i=0;i<catCount;i++) {
+                    String catName = "CAT_" + Integer.toString(i, 3);
+                    SharedPreferences catData = getSharedPreferences(catName, MODE_PRIVATE);
+                    String name = catData.getString("NAME", "naName");
+                    Set<String> itemTitle=catData.getStringSet("ITEM_TITLE", null);
+                    Set<String> itemSubttitle=catData.getStringSet("ITEM_SUBTITLE", null);
+                    int itemCount = itemTitle.size();
 
+                    Category cat = new Category(name,itemCount);
+
+                    for(int j=0;j<itemCount;j++){
+                        ItemClass item = new ItemClass();
+                        item.title=(itemTitle.toArray())[j].toString();
+                        item.subTitle=(itemSubttitle.toArray())[j].toString();
+                        item.icon=R.drawable.ic_cat1_item;
+                        cat.itemList.add(item);
+                    }
+
+                }
+            }
         }
         else{
-
+            inizializeCats();
         }
 //            int cat_count = setting.getInt("CAT_NO", 0);
 //            if (cat_count > 0) {
@@ -161,18 +184,11 @@ public class MainActivity extends AppCompatActivity
 ////        if(loadBool(_settingFile, _initFlag)){  // is initiaalized
 ////
 ////        }
-////        else{
-////            inizializeCats();
-////        }
-//
-//            inizializeCats();
-//        }
-        inizializeCats();
     }
 
     public void btnClick(View view){
         catId=Integer.parseInt(view.getTag().toString());
-        ExtendedArrayAdapter<String> aa =  new ExtendedArrayAdapter(context,cat_list.get(catId-1).itemList);
+        ExtendedArrayAdapter<String> aa =  new ExtendedArrayAdapter(context,cat_list.get(0).itemList);
         ((ListView)findViewById(R.id.mList)).setAdapter(aa);
     }
 
