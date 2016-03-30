@@ -3,14 +3,11 @@ package com.behy.listing;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -77,6 +74,7 @@ public class MainActivity extends AppCompatActivity
                 item.icon = iconList.get(j)[i];
                 cat.itemList.add(item);
                 title_set.add(titleList.get(j)[i]);
+                Log.i("init",""+subtitleList.get(j)[i]);
                 subtitle_set.add(subtitleList.get(j)[i]);
                 icon_set.add(iconList.get(j)[i]);
             }
@@ -101,94 +99,69 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//        toggle.syncState();
+//
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
         context = this;
-//        inizializeCats();
         SharedPreferences setting = getSharedPreferences(_settingFile, MODE_PRIVATE);
         if (setting.contains(_initFlag) && setting.getBoolean(_initFlag, false)) {        // is initialized
-            int catCount=setting.getInt(_cat_no,0);
-            if(catCount>0){
-                for(int i=0;i<catCount;i++) {
-                    String catName = "CAT_" + Integer.toString(i, 3);
-                    SharedPreferences catData = getSharedPreferences(catName, MODE_PRIVATE);
-                    String name = catData.getString("NAME", "naName");
-                    Set<String> itemTitle=catData.getStringSet("ITEM_TITLE", null);
-                    Set<String> itemSubttitle=catData.getStringSet("ITEM_SUBTITLE", null);
-                    int itemCount = itemTitle.size();
-
-                    Category cat = new Category(name,itemCount);
-
-                    for(int j=0;j<itemCount;j++){
-                        ItemClass item = new ItemClass();
-                        item.title=(itemTitle.toArray())[j].toString();
-                        item.subTitle=(itemSubttitle.toArray())[j].toString();
-                        item.icon=R.drawable.ic_cat1_item;
-                        cat.itemList.add(item);
-                    }
-
-                }
-            }
+            readData(setting);
+            Log.i("init","read from memory");
         }
         else{
             inizializeCats();
+            Log.i("init", "init");
         }
-//            int cat_count = setting.getInt("CAT_NO", 0);
-//            if (cat_count > 0) {
-//
-////                for (int i = 0; i < cat_count; i++) {
-////                    Category cat  = new Category();
-////                }
-////            }
-////
-////            Category cat =
-//            }
-//
-//
-//            String[] cat_name_list;              // list of categories
-//            int[] cat_pop_list;
-//
-//
-////        if(cat_count>0){
-////            for(int i=0;i<cat_count;i++){
-////                cat_name_list[i]=setting.getString("CAT_NAME_" + Integer.toString(i), "no_cat");
-////                cat_pop_list[i]=setting.getInt("CAT_POP_" + Integer.toString(i), 0);
-////                Category cat=new Category(cat_name_list[i],cat_pop_list[i]);
-////                cat_list.add(cat);
-////            }
-////        }
-////
-////    if(isInitialized()){
-////            cat_count=loadInt(_settingFile,_cat_no);
-////
-////        }
-////        if(loadBool(_settingFile, _initFlag)){  // is initiaalized
-////
-////        }
+//        inizializeCats();
+    }
+
+    private void readData(SharedPreferences setting){
+        int catCount=setting.getInt(_cat_no,0);
+        if(catCount>0){
+            for(int i=0;i<catCount;i++) {
+                String catName = "CAT_" + Integer.toString(i, 3);
+                SharedPreferences catData = getSharedPreferences(catName, MODE_PRIVATE);
+                String name = catData.getString("NAME", "naName");
+                Set<String> itemTitle=catData.getStringSet("ITEM_TITLE", null);
+                Set<String> itemSubttitle=catData.getStringSet("ITEM_SUBTITLE", null);
+                int itemCount = itemTitle.size();
+
+                Category cat = new Category(name,itemCount);
+
+                for(int j=0;j<itemCount;j++){
+                    ItemClass item = new ItemClass();
+                    item.title=(itemTitle.toArray())[j].toString();
+                    item.subTitle=(itemSubttitle.toArray())[j].toString();
+                    item.icon=R.drawable.ic_cat1_item;
+                    cat.itemList.add(item);
+                }
+                cat_list.add(cat);
+            }
+        }
+
     }
 
     public void btnClick(View view){
         catId=Integer.parseInt(view.getTag().toString());
-        ExtendedArrayAdapter<String> aa =  new ExtendedArrayAdapter(context,cat_list.get(0).itemList);
+        ExtendedArrayAdapter<String> aa =  new ExtendedArrayAdapter(context,cat_list.get(catId-1).itemList);
         ((ListView)findViewById(R.id.mList)).setAdapter(aa);
     }
 
